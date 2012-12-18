@@ -72,6 +72,7 @@
 
 #include <linux/atomic.h>
 
+#include "slab.h"
 /*
  * slob_block has a field 'units', which indicates size of block if +ve,
  * or offset of next block if -ve (in SLOB_UNITs).
