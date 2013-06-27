@@ -19,6 +19,10 @@
 #include <asm/tlbflush.h>
 #include "proc-macros.S"
 
+#ifdef CONFIG_ARM_ERRATA_720789
+#error "Patch was not ported"
+#endif
+
 /*
  *	v7wbi_flush_user_tlb_range(start, end, vma)
  *
