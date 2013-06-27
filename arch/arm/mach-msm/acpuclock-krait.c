@@ -943,6 +943,9 @@ static void __init cpufreq_table_init(void)
 					= drv.acpu_freq_tbl[i].speed.khz;
 				freq_cnt++;
 			}
+			if(cpu == 0) {
+				dev_info(drv.dev, "PABX: khz=%lu, vdd_core=%d uV\n", drv.acpu_freq_tbl[i].speed.khz, drv.acpu_freq_tbl[i].vdd_core);
+			}
 		}
 		/* freq_table not big enough to store all usable freqs. */
 		BUG_ON(drv.acpu_freq_tbl[i].speed.khz != 0);
@@ -1060,6 +1063,11 @@ static int __init get_pvs_bin(u32 pte_efuse)
 	pvs_bin = (pte_efuse >> 10) & 0x7;
 	if (pvs_bin == 0x7)
 		pvs_bin = (pte_efuse >> 13) & 0x7;
+
+	if (pvs_bin == PVS_NOMINAL) {
+		dev_info(drv.dev, "PABX: ACPU PVS: Changing PVS_NOMINAL to PVS_FAST");
+		pvs_bin = PVS_FAST;
+	}
 
 	if (pvs_bin == 0x7) {
 		pvs_bin = 0;
