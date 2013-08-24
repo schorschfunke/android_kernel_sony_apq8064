@@ -94,6 +94,9 @@ limProcessDeauthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession p
     tpDphHashNode     pStaDs;
     tpPESession       pRoamSessionEntry=NULL;
     tANI_U8           roamSessionId;
+#ifdef WLAN_FEATURE_11W
+    tANI_U32          frameLen;
+#endif
 
 
     pHdr = WDA_GET_RX_MAC_HEADER(pRxPacketInfo);
@@ -126,6 +129,24 @@ limProcessDeauthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession p
 
         return;
     }
+
+#ifdef WLAN_FEATURE_11W
+    /* PMF: If this session is a PMF session, then ensure that this frame was protected */
+    if(psessionEntry->limRmfEnabled  && (WDA_GET_RX_DPU_FEEDBACK(pRxPacketInfo) & DPU_FEEDBACK_UNPROTECTED_ERROR))
+    {
+        PELOGE(limLog(pMac, LOGE, FL("received an unprotected deauth from AP"));)
+        // If the frame received is unprotected, forward it to the supplicant to initiate
+        // an SA query
+        frameLen = WDA_GET_RX_PAYLOAD_LEN(pRxPacketInfo);
+
+        //send the unprotected frame indication to SME
+        limSendSmeUnprotectedMgmtFrameInd( pMac, pHdr->fc.subType,
+                                           (tANI_U8*)pHdr, (frameLen + sizeof(tSirMacMgmtHdr)),
+                                           psessionEntry->smeSessionId, psessionEntry);
+        return;
+    }
+#endif
+
     // Get reasonCode from Deauthentication frame body
     reasonCode = sirReadU16(pBody);
 
@@ -136,7 +157,7 @@ limProcessDeauthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession p
       
     if (limCheckDisassocDeauthAckPending(pMac, (tANI_U8*)pHdr->sa))
     {
-        PELOGW(limLog(pMac, LOGW,
+        PELOGW(limLog(pMac, LOGE, 
                     FL("Ignore the Deauth received, while waiting for ack of disassoc/deauth"));)
         limCleanUpDisassocDeauthReq(pMac,(tANI_U8*)pHdr->sa, 1);
         return;
@@ -190,11 +211,11 @@ limProcessDeauthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession p
     else
     {
         // Received Deauth frame in either IBSS
-        // or un-known role. Log and ignore it
-        limLog(pMac, LOG1,
+        // or un-known role. Log error and ignore it
+        limLog(pMac, LOGE,
            FL("received Deauth frame with reasonCode %d in role %d from "),
            reasonCode, psessionEntry->limSystemRole);
-          limPrintMacAddr(pMac, pHdr->sa, LOG1);
+          limPrintMacAddr(pMac, pHdr->sa, LOGE);
 
         return;
     }
@@ -252,7 +273,7 @@ limProcessDeauthFrame(tpAniSirGlobal pMac, tANI_U8 *pRxPacketInfo, tpPESession p
             PELOGE(limLog(pMac, LOGE, FL("received DeAuth from an AP other than we're trying to join. Ignore. "));)
             if (limSearchPreAuthList(pMac, pHdr->sa))
             {
-                PELOG1(limLog(pMac, LOG1, FL("Preauth entry exist. Deleting... "));)
+                PELOGE(limLog(pMac, LOGE, FL("Preauth entry exist. Deleting... "));)
                 limDeletePreAuthNode(pMac, pHdr->sa);
             }
             return;

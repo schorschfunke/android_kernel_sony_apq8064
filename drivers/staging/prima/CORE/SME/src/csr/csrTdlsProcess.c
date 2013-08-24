@@ -47,12 +47,8 @@
   
     Implementation for the TDLS interface to PE.
   
-   Copyright (c) 2013 Qualcomm Atheros, Inc.All Rights Reserved.
-   Qualcomm Atheros Confidential and Proprietary.
-    
-   Copyright (c) 2010 Qualcomm Technologies, Inc.All Rights Reserved.
-   Qualcomm Technologies Confidential and Proprietary
-
+    Copyright (C) 2010 Qualcomm, Incorporated
+  
  
    ========================================================================== */
 
@@ -448,11 +444,6 @@ eHalStatus csrTdlsProcessSendMgmt( tpAniSirGlobal pMac, tSmeCmd *cmd )
     tCsrRoamSession *pSession = CSR_GET_SESSION( pMac, cmd->sessionId );
     eHalStatus status = eHAL_STATUS_FAILURE;
 
-    if (NULL == pSession)
-    {
-        return eHAL_STATUS_FAILURE;
-    }
-
     if (NULL == pSession->pConnectBssDesc)
     {
         smsLog( pMac, LOGE, FL("BSS Description is not present") );
@@ -512,11 +503,6 @@ eHalStatus csrTdlsProcessAddSta( tpAniSirGlobal pMac, tSmeCmd *cmd )
     tSirTdlsAddStaReq *tdlsAddStaReq = NULL ;
     tCsrRoamSession *pSession = CSR_GET_SESSION( pMac, cmd->sessionId );
     eHalStatus status = eHAL_STATUS_FAILURE;
-
-    if (NULL == pSession)
-    {
-        return eHAL_STATUS_FAILURE;
-    }
 
     if (NULL == pSession->pConnectBssDesc)
     {
@@ -578,11 +564,6 @@ eHalStatus csrTdlsProcessDelSta( tpAniSirGlobal pMac, tSmeCmd *cmd )
     tSirTdlsDelStaReq *tdlsDelStaReq = NULL ;
     tCsrRoamSession *pSession = CSR_GET_SESSION( pMac, cmd->sessionId );
     eHalStatus status = eHAL_STATUS_FAILURE;
-
-    if (NULL == pSession)
-    {
-        return eHAL_STATUS_FAILURE;
-    }
 
     if (NULL == pSession->pConnectBssDesc)
     {

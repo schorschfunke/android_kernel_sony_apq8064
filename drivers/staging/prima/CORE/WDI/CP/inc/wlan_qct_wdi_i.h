@@ -39,6 +39,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
+
 #ifndef WLAN_QCT_WDI_I_H
 #define WLAN_QCT_WDI_I_H
 
@@ -54,8 +55,8 @@ DESCRIPTION
   module to be used by the DAL Data Path Core. 
   
       
-  Copyright (c) 2010 QUALCOMM Incorporated. All Rights Reserved.
-  Qualcomm Confidential and Proprietary
+  Copyright (c) 2010 Qualcomm Technologies, Inc. All Rights Reserved.
+  Qualcomm Technologies Confidential and Proprietary
 ===========================================================================*/
 
 
@@ -444,7 +445,8 @@ typedef enum
 
   /*WLAN DAL Set Tx Power Request*/
   WDI_SET_TX_POWER_REQ                          = 82,
-  WDI_ROAM_SCAN_OFFLOAD_REQ                     = 83,
+  WDI_START_ROAM_CANDIDATE_LOOKUP_REQ           = 83,
+
   WDI_MAX_REQ,
 
   /*Send a suspend Indication down to HAL*/
@@ -452,6 +454,9 @@ typedef enum
 
   /* Send a traffic stats indication to HAL */
   WDI_TRAFFIC_STATS_IND,
+
+  /* Drop/Receive unencrypted frames indication to HAL */
+  WDI_EXCLUDE_UNENCRYPTED_IND,
 
   /*Keep adding the indications to the max request
     such that we keep them sepparate */
@@ -707,7 +712,9 @@ typedef enum
   WDI_GET_ROAM_RSSI_RESP                        = 80,
 
   WDI_SET_TX_POWER_RESP                         = 81,
-  WDI_ROAM_SCAN_OFFLOAD_RESP                    = 82,
+  WDI_START_ROAM_CANDIDATE_LOOKUP_RESP          = 82,
+
+
   /*-------------------------------------------------------------------------
     Indications
      !! Keep these last in the enum if possible
@@ -2729,6 +2736,26 @@ WDI_ProcessTrafficStatsInd
   WDI_ControlBlockType*  pWDICtx,
   WDI_EventInfoType*     pEventData
 );
+
+#ifdef WLAN_FEATURE_11W
+/**
+ @brief Process Exclude Unencrypted Indications function (called
+        when Main FSM allows it)
+
+ @param  pWDICtx:         pointer to the WLAN DAL context
+              pEventData:      pointer to the event information structure
+
+ @see
+ @return Result of the function call
+*/
+WDI_Status
+WDI_ProcessExcludeUnencryptInd
+(
+  WDI_ControlBlockType*  pWDICtx,
+  WDI_EventInfoType*     pEventData
+);
+#endif
+
 /*========================================================================
           Main DAL Control Path Response Processing API 
 ========================================================================*/
@@ -4576,19 +4603,24 @@ WDI_FindEmptySession
 );
 
 /**
- @brief Helper routine used to get the total count of active 
+ @brief Helper routine used to get the total count of active
         sessions
-  
- 
- @param  pWDICtx:       pointer to the WLAN DAL context 
-  
+
+
+ @param  pWDICtx:       pointer to the WLAN DAL context
+         macBSSID:      pointer to BSSID. If NULL, get all the session.
+                        If not NULL, count ActiveSession by excluding (TRUE) or including (FALSE) skipBSSID.
+         skipBSSID:     if TRUE, get all the sessions except matching to macBSSID. If FALSE, get all session.
+                        This argument is ignored if macBSSID is NULL.
  @see
  @return Number of sessions in use
 */
 wpt_uint8
 WDI_GetActiveSessionsCount
-( 
-  WDI_ControlBlockType*   pWDICtx
+(
+  WDI_ControlBlockType*   pWDICtx,
+  wpt_macAddr             macBSSID,
+  wpt_boolean             skipBSSID
 );
 
 /**
@@ -4846,6 +4878,7 @@ WDI_ProcessUpdateScanParamsRsp
 );
 #endif // FEATURE_WLAN_SCAN_PNO
 
+
 #ifdef WLAN_FEATURE_ROAM_SCAN_OFFLOAD
 /**
  @brief Process Start Roam Candidate Lookup Request function
@@ -4857,7 +4890,7 @@ WDI_ProcessUpdateScanParamsRsp
  @return Result of the function call
 */
 WDI_Status
-WDI_ProcessRoamScanOffloadReq
+WDI_ProcessStartRoamCandidatelookupReq
 (
   WDI_ControlBlockType*  pWDICtx,
   WDI_EventInfoType*     pEventData
@@ -4873,12 +4906,13 @@ WDI_ProcessRoamScanOffloadReq
  @return Result of the function call
 */
 WDI_Status
-WDI_ProcessRoamScanOffloadRsp
+WDI_ProcessStartRoamCandidatelookupRsp
 (
   WDI_ControlBlockType*  pWDICtx,
   WDI_EventInfoType*     pEventData
 );
 #endif
+
 
 #ifdef WLAN_FEATURE_PACKET_FILTERING
 /**
@@ -5133,6 +5167,7 @@ WDI_ProcessUpdateVHTOpModeRsp
   WDI_EventInfoType*     pEventData
 );
 #endif
+
 #ifdef WLAN_FEATURE_ROAM_SCAN_OFFLOAD
 /**
  *  @brief WDI_wdiEdTypeEncToEdTypeEnc -

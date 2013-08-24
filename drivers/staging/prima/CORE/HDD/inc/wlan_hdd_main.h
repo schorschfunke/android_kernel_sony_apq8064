@@ -131,7 +131,7 @@
 #define WAIT_TIME_TDLS_MGMT         11000
 
 /** Maximum time(ms) to wait for tdls initiator to start direct communication **/
-#define WAIT_TIME_TDLS_INITIATOR    600
+#define WAIT_TIME_TDLS_INITIATOR    300
 /* Maximum time to get crda entry settings */
 #define CRDA_WAIT_TIME 300
 
@@ -165,15 +165,17 @@
 #define WLAN_HDD_P2P_SOCIAL_CHANNELS 3
 #define WLAN_HDD_P2P_SINGLE_CHANNEL_SCAN 1
 
+#ifdef WLAN_FEATURE_11W
+#define WLAN_HDD_SA_QUERY_ACTION_FRAME 8
+#endif
+
 #define WLAN_HDD_PUBLIC_ACTION_TDLS_DISC_RESP 14
 #define WLAN_HDD_TDLS_ACTION_FRAME 12
 #ifdef WLAN_FEATURE_HOLD_RX_WAKELOCK
-#define HDD_WAKE_LOCK_DURATION 50 //in msecs
+#define HDD_WAKE_LOCK_DURATION 50
 #endif
 
-#define HDD_SAP_WAKE_LOCK_DURATION 10000 //in msecs
-
-#define HDD_MOD_EXIT_SSR_MAX_RETRIES 30
+#define HDD_SAP_WAKE_LOCK_DURATION 10000 //10 sec
 
 /* Maximum number of interfaces allowed(STA, P2P Device, P2P Interface) */
 #define WLAN_MAX_INTERFACES 3
@@ -182,9 +184,6 @@
 #define GTK_OFFLOAD_ENABLE  0
 #define GTK_OFFLOAD_DISABLE 1
 #endif
-
-#define HDD_MAC_ADDR_LEN    6
-typedef v_U8_t tWlanHddMacAddr[HDD_MAC_ADDR_LEN];
 
 typedef struct hdd_tx_rx_stats_s
 {
@@ -230,6 +229,14 @@ typedef struct hdd_chip_reset_stats_s
    __u32    totalUnknownExceptions;
 } hdd_chip_reset_stats_t;
 
+#ifdef WLAN_FEATURE_11W
+typedef struct hdd_pmf_stats_s
+{
+   uint8    numUnprotDeauthRx;
+   uint8    numUnprotDisassocRx;
+} hdd_pmf_stats_t;
+#endif
+
 typedef struct hdd_stats_s
 {
    tCsrSummaryStatsInfo       summary_stat;
@@ -240,6 +247,9 @@ typedef struct hdd_stats_s
    tCsrPerStaStatsInfo        perStaStats;
    hdd_tx_rx_stats_t          hddTxRxStats;
    hdd_chip_reset_stats_t     hddChipResetStats;
+#ifdef WLAN_FEATURE_11W
+   hdd_pmf_stats_t            hddPmfStats;
+#endif
 } hdd_stats_t;
 
 typedef enum
@@ -266,12 +276,6 @@ typedef struct roaming_info_s
 {
    HDD_ROAM_STATE roamingState;
    vos_event_t roamingEvent;
-
-   tWlanHddMacAddr bssid;
-   tWlanHddMacAddr peerMac;
-   tANI_U32 roamId;
-   eRoamCmdStatus roamStatus;
-   v_BOOL_t deferKeyComplete;
    
 } roaming_info_t;
 
@@ -407,7 +411,8 @@ typedef enum device_mode
    WLAN_HDD_P2P_GO,
    WLAN_HDD_MONITOR,
    WLAN_HDD_FTM,
-   WLAN_HDD_P2P_DEVICE
+   WLAN_HDD_IBSS,
+   WLAN_HDD_P2P_DEVICE,
 }device_mode_t;
 
 typedef enum rem_on_channel_request_type
@@ -449,6 +454,7 @@ typedef struct
    v_TIME_t             lastblockTs;
    v_TIME_t             lastOpenTs;
    struct netdev_queue *blockedQueue;
+   v_BOOL_t             qBlocked;
 } hdd_thermal_mitigation_info_t;
 
 typedef struct hdd_remain_on_chan_ctx
@@ -520,6 +526,8 @@ struct hdd_station_ctx
    connection_info_t conn_info;
 
    roaming_info_t roam_info;
+
+   v_BOOL_t bSendDisconnect;
 
 #if  defined (WLAN_FEATURE_VOWIFI_11R) || defined (FEATURE_WLAN_CCX) || defined(FEATURE_WLAN_LFR)
    int     ft_carrier_on;
@@ -812,12 +820,10 @@ typedef struct hdd_dynamic_mcbcfilter_s
 #define WLAN_HDD_GET_HOSTAP_STATE_PTR(pAdapter) (&(pAdapter)->sessionCtx.ap.HostapdState)
 #define WLAN_HDD_GET_CFG_STATE_PTR(pAdapter)  (&(pAdapter)->cfg80211State)
 #ifdef FEATURE_WLAN_TDLS
-#define WLAN_HDD_IS_TDLS_SUPPORTED_ADAPTER(pAdapter) \
-        (((WLAN_HDD_INFRA_STATION != pAdapter->device_mode) && \
-        (WLAN_HDD_P2P_CLIENT != pAdapter->device_mode)) ? 0 : 1)
 #define WLAN_HDD_GET_TDLS_CTX_PTR(pAdapter) \
-        ((WLAN_HDD_IS_TDLS_SUPPORTED_ADAPTER(pAdapter)) ? \
-        (tdlsCtx_t*)(pAdapter)->sessionCtx.station.pHddTdlsCtx : NULL)
+        (((WLAN_HDD_INFRA_STATION != pAdapter->device_mode) && \
+        (WLAN_HDD_P2P_CLIENT != pAdapter->device_mode)) ? NULL : \
+        (tdlsCtx_t*)(pAdapter)->sessionCtx.station.pHddTdlsCtx)
 #endif
 
 typedef struct hdd_adapter_list_node
@@ -832,15 +838,6 @@ typedef struct hdd_priv_data_s
    int used_len;
    int total_len;
 }hdd_priv_data_t;
-
-typedef struct
-{
-   vos_timer_t trafficTimer;
-   atomic_t    isActiveMode;
-   v_U8_t      isInitialized;
-   vos_lock_t  trafficLock;
-   v_TIME_t    lastFrameTs;
-}hdd_traffic_monitor_t;
 
 /** Adapter stucture definition */
 
@@ -988,8 +985,6 @@ struct hdd_context_s
     tANI_U16 connected_peer_count;
     tdls_scan_context_t tdls_scan_ctxt;
 #endif
-
-    hdd_traffic_monitor_t traffic_monitor;
 };
 
 
@@ -1065,8 +1060,4 @@ VOS_STATUS wlan_hdd_restart_driver(hdd_context_t *pHddCtx);
 void hdd_exchange_version_and_caps(hdd_context_t *pHddCtx);
 void hdd_set_pwrparams(hdd_context_t *pHddCtx);
 void hdd_reset_pwrparams(hdd_context_t *pHddCtx);
-int wlan_hdd_validate_context(hdd_context_t *pHddCtx);
-#ifdef WLAN_FEATURE_PACKET_FILTERING
-int wlan_hdd_setIPv6Filter(hdd_context_t *pHddCtx, tANI_U8 filterType, tANI_U8 sessionId);
-#endif
 #endif    // end #if !defined( WLAN_HDD_MAIN_H )
