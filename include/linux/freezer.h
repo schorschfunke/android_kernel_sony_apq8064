@@ -136,6 +136,14 @@ static inline void freezer_count(void)
 	try_to_freeze();
 }
 
+/* DO NOT ADD ANY NEW CALLERS OF THIS FUNCTION */
+static inline void freezer_count_unsafe(void)
+{
+	current->flags &= ~PF_FREEZER_SKIP;
+	smp_mb();
+	try_to_freeze_unsafe();
+}
+
 /**
  * freezer_should_skip - whether to skip a task when determining frozen
  *			 state is reached
