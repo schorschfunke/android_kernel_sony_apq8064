@@ -245,8 +245,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 
 HOSTCC       = gcc
 HOSTCXX      = g++
-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O3 -fomit-frame-pointer -fmodulo-sched -fmodulo-sched-allow-regmoves -fstrict-aliasing -Wstrict-aliasing=2 -Werror=strict-aliasing
-HOSTCXXFLAGS = -O3 -fmodulo-sched -fmodulo-sched-allow-regmoves -fstrict-aliasing -Wstrict-aliasing=2 -Werror=strict-aliasing 
+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -Ofast -fomit-frame-pointer -fmodulo-sched -fmodulo-sched-allow-regmoves -fstrict-aliasing -Wstrict-aliasing=2 -Werror=strict-aliasing
+HOSTCXXFLAGS = -Ofast -fmodulo-sched -fmodulo-sched-allow-regmoves -fstrict-aliasing -Wstrict-aliasing=2 -Werror=strict-aliasing 
 
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
@@ -561,7 +561,7 @@ all: vmlinux
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS  += -Os -fmodulo-sched -fmodulo-sched-allow-regmoves
 else
-KBUILD_CFLAGS  += -O3 -fmodulo-sched -fmodulo-sched-allow-regmoves -fstrict-aliasing -Wstrict-aliasing=2 -Werror=strict-aliasing
+KBUILD_CFLAGS  += -Ofast -fmodulo-sched -fmodulo-sched-allow-regmoves -fstrict-aliasing -Wstrict-aliasing=2 -Werror=strict-aliasing
 endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile
