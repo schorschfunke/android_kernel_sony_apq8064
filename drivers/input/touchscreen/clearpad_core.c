@@ -2046,8 +2046,8 @@ static void synaptics_clearpad_process_irq(struct synaptics_clearpad *this)
 	}
 
 	if (interrupt & this->pdt[SYN_F11_2D].irq_mask) {
-		/*if (this->easy_wakeup_config.gesture_enable
-		    && !(this->active & SYN_ACTIVE_POWER))*/ {
+		if (/*this->easy_wakeup_config.gesture_enable
+		    &&*/ !(this->active & SYN_ACTIVE_POWER)) {
 			if (synaptics_clearpad_handle_gesture(this) == 0)
 				goto unlock; /* gesture handled */
 			else
