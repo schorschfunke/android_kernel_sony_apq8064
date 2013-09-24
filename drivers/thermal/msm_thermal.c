@@ -62,6 +62,7 @@ static unsigned int limit_idx_high;
 static bool thermal_debug = false;
 static bool throttle_on = false;
 static unsigned int throttle_temp = DEFAULT_THROTTLE_TEMP;
+static unsigned int max_frequency;
 
 static struct cpufreq_frequency_table *table;
 struct cpufreq_policy *policy = NULL;
