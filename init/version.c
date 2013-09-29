@@ -44,5 +44,5 @@ const char linux_banner[] =
 
 const char linux_proc_banner[] =
 	"%s version %s"
-	" (" LINUX_COMPILE_BY "@" LINUX_COMPILE_HOST ")"
+	" Catears Xperia Z v1.0 (29.09.2013)"
 	" (" LINUX_COMPILER ") %s\n";
