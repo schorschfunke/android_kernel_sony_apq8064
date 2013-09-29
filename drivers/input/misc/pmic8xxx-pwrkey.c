@@ -224,8 +224,8 @@ static int __devinit pmic8xxx_pwrkey_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, pwrkey);
 
 	#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_DT2WAKE
-  	dt2wake_setdev(pwr);
-  	printk(KERN_INFO "[dt2wake]: set device %s\n", pwr->name);
+  	sweep2wake_setdev(pwr);
+  	printk(KERN_INFO "[sweep2wake]: set device %s\n", pwr->name);
 	#endif
 
 	err = request_any_context_irq(key_press_irq, pwrkey_press_irq,

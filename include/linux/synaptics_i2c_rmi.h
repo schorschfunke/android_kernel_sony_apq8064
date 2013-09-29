@@ -57,7 +57,7 @@ struct synaptics_i2c_rmi_platform_data {
 };
 
 #ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_DT2WAKE
-extern void dt2wake_setdev(struct input_dev * input_device);
+extern void sweep2wake_setdev(struct input_dev * input_device);
 #endif
 
 #endif /* _LINUX_SYNAPTICS_I2C_RMI_H */
