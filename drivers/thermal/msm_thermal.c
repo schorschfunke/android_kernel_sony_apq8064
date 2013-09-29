@@ -43,11 +43,6 @@
 #define HOT_TEMP_OFFSET_MS			250
 #define DEFAULT_MIN_FREQ_INDEX		7
 
-#define POLLING_DELAY 100
-
-unsigned int temp_threshold = 65;
-module_param(temp_threshold, int, 0755);
-
 static int enabled;
 static struct msm_thermal_data msm_thermal_info;
 static uint32_t limited_max_freq = MSM_CPUFREQ_NO_LIMIT;
@@ -65,7 +60,6 @@ static unsigned int throttle_temp = DEFAULT_THROTTLE_TEMP;
 static unsigned int max_frequency;
 
 static struct cpufreq_frequency_table *table;
-struct cpufreq_policy *policy = NULL;
 
 static int msm_thermal_get_freq_table(void)
 {
@@ -79,7 +73,7 @@ static int msm_thermal_get_freq_table(void)
 		goto fail;
 	}
 
-	while (table[i].frequency != max_frequency)
+	while (table[i].frequency != CPUFREQ_TABLE_END)
 		i++;
 
 	min_freq_index = DEFAULT_MIN_FREQ_INDEX;
@@ -405,6 +399,7 @@ static int set_min_freq_index(const char *val, const struct kernel_param *kp)
 }
 
 static struct kernel_param_ops module_ops = {
+>>>>>>> b8acde1... Intell-thermal - re_init + Screen Gamma - Hard coded
 	.set = set_enabled,
 	.get = param_get_bool,
 };
@@ -614,6 +609,16 @@ static int __devinit msm_thermal_dev_probe(struct platform_device *pdev)
 	if (ret)
 		goto fail;
 	WARN_ON(data.sensor_id >= TSENS_MAX_SENSORS);
+
+	key = "qcom,poll-ms";
+	ret = of_property_read_u32(node, key, &data.poll_ms);
+	if (ret)
+		goto fail;
+
+	key = "qcom,limit-temp";
+	ret = of_property_read_u32(node, key, &data.limit_temp_degC);
+	if (ret)
+		goto fail;
 
 	key = "qcom,temp-hysteresis";
 	ret = of_property_read_u32(node, key, &data.temp_hysteresis_degC);
