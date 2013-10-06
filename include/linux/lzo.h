@@ -14,18 +14,18 @@
  *  Richard Purdie <rpurdie@openedhand.com>
  */
 
-#define LZO1X_1_MEM_COMPRESS	(8192 * sizeof(unsigned short))
+#define LZO1X_1_MEM_COMPRESS	(8192 * sizeof(unsigned char *))
 #define LZO1X_MEM_COMPRESS	LZO1X_1_MEM_COMPRESS
 
 #define lzo1x_worst_compress(x) ((x) + ((x) / 16) + 64 + 3)
 
 /* This requires 'wrkmem' of size LZO1X_1_MEM_COMPRESS */
 int lzo1x_1_compress(const unsigned char *src, size_t src_len,
-		     unsigned char *dst, size_t *dst_len, void *wrkmem);
+			unsigned char *dst, size_t *dst_len, void *wrkmem);
 
 /* safe decompression with overrun testing */
 int lzo1x_decompress_safe(const unsigned char *src, size_t src_len,
-			  unsigned char *dst, size_t *dst_len);
+			unsigned char *dst, size_t *dst_len);
 
 /*
  * Return values (< 0 = Error)
