@@ -245,8 +245,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 
 HOSTCC       = gcc
 HOSTCXX      = g++
-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -Ofast -fomit-frame-pointer -fmodulo-sched -fmodulo-sched-allow-regmoves -fstrict-aliasing -Wstrict-aliasing=2 -Werror=strict-aliasing -mcpu=cortex-a15 -mfpu=neon-vfpv4 -mfloat-abi=hard -funsafe-math-optimizations -ftree-vectorize
-HOSTCXXFLAGS = -Ofast -fmodulo-sched -fmodulo-sched-allow-regmoves -fstrict-aliasing -Wstrict-aliasing=2 -Werror=strict-aliasing -mcpu=cortex-a15 -mfpu=neon-vfpv4 -mfloat-abi=hard -funsafe-math-optimizations -ftree-vectorize
+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -Ofast -fomit-frame-pointer -fmodulo-sched -fmodulo-sched-allow-regmoves -fstrict-aliasing -Wstrict-aliasing=2 -Werror=strict-aliasing -mtune=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -funsafe-math-optimizations -ftree-vectorize
+HOSTCXXFLAGS = -Ofast -fmodulo-sched -fmodulo-sched-allow-regmoves -fstrict-aliasing -Wstrict-aliasing=2 -Werror=strict-aliasing -mtune=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -funsafe-math-optimizations -ftree-vectorize
 
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
@@ -350,8 +350,8 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  = --strip-debug
-CFLAGS_KERNEL	= -mcpu=cortex-a15 -mfpu=neon-vfpv4 -mfloat-abi=hard -funsafe-math-optimizations -ftree-vectorize  
-AFLAGS_KERNEL	= -mcpu=cortex-a15 -mfpu=neon-vfpv4 -mfloat-abi=hard -funsafe-math-optimizations -ftree-vectorize  
+CFLAGS_KERNEL	= -mtune=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -funsafe-math-optimizations -ftree-vectorize  
+AFLAGS_KERNEL	= -mtune=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -funsafe-math-optimizations -ftree-vectorize  
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 
