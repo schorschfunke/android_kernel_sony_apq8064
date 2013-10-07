@@ -1947,6 +1947,7 @@ static int synaptics_clearpad_handle_gesture(struct synaptics_clearpad *this)
 		{ 	
 		    in_prog=1;
    		    dt2w_func();
+		    synaptics_clearpad_reset_power(this);
 		}
 		#endif 
 
@@ -1963,6 +1964,7 @@ static int synaptics_clearpad_handle_gesture(struct synaptics_clearpad *this)
 		{
 		     in_prog=1;
    		     dt2w_func();
+		     synaptics_clearpad_reset_power(this);
 		}
 		#endif
 
