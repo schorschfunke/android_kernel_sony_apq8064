@@ -350,8 +350,8 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  = --strip-debug
-CFLAGS_KERNEL	= -mtune=cortex-a15 -mfpu=neon-vfpv4 -mfloat-abi=softfp -funsafe-math-optimizations -ftree-vectorize  
-AFLAGS_KERNEL	= -mtune=cortex-a15 -mfpu=neon-vfpv4 -mfloat-abi=softfp -funsafe-math-optimizations -ftree-vectorize  
+CFLAGS_KERNEL	= -mcpu=cortex-a15 -mtune=cortex-a15 -march=armv7-a -marm -mfpu=neon -funsafe-math-optimizations -ftree-vectorize -funroll-loops
+AFLAGS_KERNEL	= -mcpu=cortex-a15 -mtune=cortex-a15 -march=armv7-a -marm -mfpu=neon -funsafe-math-optimizations -ftree-vectorize -funroll-loops  
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 
