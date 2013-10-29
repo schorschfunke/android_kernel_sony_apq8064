@@ -44,5 +44,5 @@ const char linux_banner[] =
 
 const char linux_proc_banner[] =
 	"%s version %s"
-	" Catears_v1.3"
+	" ( Catears - v1.4 )"
 	" (" LINUX_COMPILER ") %s\n";
