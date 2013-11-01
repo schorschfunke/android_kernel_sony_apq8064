@@ -1315,6 +1315,8 @@ core_initcall(msm_pm_setup_saved_state);
 
 static int __init msm_pm_init(void)
 {
+	int rc;
+
 	enum msm_pm_time_stats_id enable_stats[] = {
 		MSM_PM_STAT_IDLE_WFI,
 		MSM_PM_STAT_RETENTION,
