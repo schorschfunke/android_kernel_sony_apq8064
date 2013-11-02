@@ -33,6 +33,8 @@
 
 #include <trace/events/kmem.h>
 
+#include "slab.h"
+
 /*
  * Lock order:
  *   1. slub_lock (Global Semaphore)
