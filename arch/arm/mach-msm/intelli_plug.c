@@ -13,7 +13,6 @@
  * GNU General Public License for more details.
  *
  */
-#include <linux/earlysuspend.h>
 #include <linux/workqueue.h>
 #include <linux/cpu.h>
 #include <linux/sched.h>
@@ -21,13 +20,17 @@
 #include <linux/module.h>
 #include <linux/rq_stats.h>
 
+#if CONFIG_POWERSUSPEND
+#include <linux/powersuspend.h>
+#endif
+
 //#define DEBUG_INTELLI_PLUG
 #undef DEBUG_INTELLI_PLUG
 
 #define INTELLI_PLUG_MAJOR_VERSION	1
-#define INTELLI_PLUG_MINOR_VERSION	8
+#define INTELLI_PLUG_MINOR_VERSION	9
 
-#define DEF_SAMPLING_MS			(200)
+#define DEF_SAMPLING_MS			(250)
 #define BUSY_SAMPLING_MS		(100)
 
 #define DUAL_CORE_PERSISTENCE		15
@@ -284,8 +287,8 @@ static void __cpuinit intelli_plug_work_fn(struct work_struct *work)
 		msecs_to_jiffies(sampling_time));
 }
 
-#ifdef CONFIG_HAS_EARLYSUSPEND
-static void intelli_plug_early_suspend(struct early_suspend *handler)
+#ifdef CONFIG_POWERSUSPEND
+static void intelli_plug_suspend(struct power_suspend *handler)
 {
 	int i;
 	int num_of_active_cores = 4;
@@ -302,7 +305,7 @@ static void intelli_plug_early_suspend(struct early_suspend *handler)
 	}
 }
 
-static void __cpuinit intelli_plug_late_resume(struct early_suspend *handler)
+static void __cpuinit intelli_plug_resume(struct power_suspend *handler)
 {
 	int num_of_active_cores;
 	int i;
@@ -327,15 +330,15 @@ static void __cpuinit intelli_plug_late_resume(struct early_suspend *handler)
 		msecs_to_jiffies(10));
 }
 
-static struct early_suspend intelli_plug_early_suspend_struct_driver = {
-	.level = EARLY_SUSPEND_LEVEL_DISABLE_FB + 10,
-	.suspend = intelli_plug_early_suspend,
-	.resume = intelli_plug_late_resume,
+static struct power_suspend intelli_plug_power_suspend_driver = {
+	.suspend = intelli_plug_suspend,
+	.resume = intelli_plug_resume,
 };
-#endif	/* CONFIG_HAS_EARLYSUSPEND */
+#endif  /* CONFIG_POWERSUSPEND */
 
 int __init intelli_plug_init(void)
 {
+
 	//pr_info("intelli_plug: scheduler delay is: %d\n", delay);
 	pr_info("intelli_plug: version %d.%d by faux123\n",
 		 INTELLI_PLUG_MAJOR_VERSION,
@@ -343,13 +346,14 @@ int __init intelli_plug_init(void)
 
 	sampling_time = DEF_SAMPLING_MS;
 
+#ifdef CONFIG_POWERSUSPEND
+	register_power_suspend(&intelli_plug_power_suspend_driver);
+#endif
+
 	INIT_DELAYED_WORK(&intelli_plug_work, intelli_plug_work_fn);
 	schedule_delayed_work_on(0, &intelli_plug_work,
 		msecs_to_jiffies(sampling_time));
 
-#ifdef CONFIG_HAS_EARLYSUSPEND
-	register_early_suspend(&intelli_plug_early_suspend_struct_driver);
-#endif
 	return 0;
 }
 
