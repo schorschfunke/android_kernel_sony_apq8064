@@ -275,7 +275,7 @@ static int __init power_suspend_init(void)
 		return -ENOMEM;
 	}
 
-	mode = POWER_SUSPEND_USERSPACE;
+	mode = POWER_SUSPEND_KERNEL;
 
 	return 0;
 }
