@@ -137,7 +137,6 @@ do {					\
 } while (0)
 
 int screen_sus=0;
-int in_prog=0;
 int cancel_pwrtrigger = 0;
 int dt2w_switch = 1;
 int s2w_switch =1;
@@ -147,11 +146,11 @@ static struct input_dev * dt2wake_pwrdev;
 static DEFINE_MUTEX(pwrkeyworklock);
 static DEFINE_MUTEX(longtap_count_lock);
 
-extern void sweep2wake_setdev(struct input_dev * input_device) {
+extern void dt2wake_setdev(struct input_dev * input_device) {
   dt2wake_pwrdev = input_device;
   return;
 }
-EXPORT_SYMBOL(sweep2wake_setdev);
+EXPORT_SYMBOL(dt2wake_setdev);
 
 static void dt2wake_presspwr(struct work_struct * dt2wake_presspwr_work) {
 
@@ -1922,7 +1921,7 @@ static int synaptics_clearpad_handle_gesture(struct synaptics_clearpad *this)
 {
 	u8 wakeint;
 	int rc;
-	
+
 	rc = synaptics_read(this, SYNF(F11_2D, DATA,
 			this->easy_wakeup_config.large_panel ? 0x39 : 0x43),
 			&wakeint, 1);
@@ -1939,31 +1938,25 @@ static int synaptics_clearpad_handle_gesture(struct synaptics_clearpad *this)
 
 	switch (wakeint) {
 	case XY_LPWG_STATUS_DOUBLE_TAP_DETECTED:
-		//rc = evgen_execute(this->input, this->evgen_blocks,
-		//			"double_tap");
+		rc = evgen_execute(this->input, this->evgen_blocks,
+					"double_tap");
 		
 		#ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_DT2WAKE
-		if(dt2w_switch == 1 && screen_sus==1 && in_prog==0)
-		{ 	
-		    in_prog=1;
-   		    dt2w_func();
-		}
+		if(dt2w_switch == 1 && screen_sus==0)
+   		dt2w_func();
 		#endif 
 
 		break;
 	case XY_LPWG_STATUS_SWIPE_DETECTED:
-		//rc = evgen_execute(this->input, this->evgen_blocks,
-		//			"single_swipe");
+		rc = evgen_execute(this->input, this->evgen_blocks,
+					"single_swipe");
 		break;
 	case XY_LPWG_STATUS_TWO_SWIPE_DETECTED:
-		//rc = evgen_execute(this->input, this->evgen_blocks,
-		//			"two_swipe");
+		rc = evgen_execute(this->input, this->evgen_blocks,
+					"two_swipe");
 		#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
-		if(s2w_switch == 1 && in_prog==0)
-		{
-		     in_prog=1;
-   		     dt2w_func();
-		}
+		if(s2w_switch == 1)
+   		dt2w_func();
 		#endif
 
 		break;
@@ -2054,8 +2047,7 @@ static void synaptics_clearpad_process_irq(struct synaptics_clearpad *this)
 
 	if (interrupt & this->pdt[SYN_F11_2D].irq_mask) {
 		if (/*this->easy_wakeup_config.gesture_enable
-		    &&*/ !(this->active & SYN_ACTIVE_POWER))	
-			{
+		    &&*/ !(this->active & SYN_ACTIVE_POWER)) {
 			if (synaptics_clearpad_handle_gesture(this) == 0)
 				goto unlock; /* gesture handled */
 			else
@@ -2812,6 +2804,11 @@ static int synaptics_clearpad_pm_suspend(struct device *dev)
 	struct synaptics_clearpad *this = dev_get_drvdata(dev);
 	unsigned long flags;
 
+	#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+	printk("\n [S2W]: Screen suspended\n");
+        screen_sus = 1;
+	#endif
+
 	spin_lock_irqsave(&this->slock, flags);
 	if (unlikely(this->dev_busy)) {
 		dev_info(dev, "Busy to suspend\n");
@@ -2839,6 +2836,11 @@ static int synaptics_clearpad_pm_resume(struct device *dev)
 	struct synaptics_clearpad *this = dev_get_drvdata(dev);
 	unsigned long flags;
 	bool irq_pending;
+
+	#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
+	printk("\n [S2W]: Screen not suspended\n");        
+	screen_sus = 0;
+	#endif
 
 	if (device_may_wakeup(dev)||dt2w_switch==1||s2w_switch==1) {
 		disable_irq_wake(this->pdata->irq);
@@ -2877,13 +2879,6 @@ static void synaptics_clearpad_early_suspend(struct early_suspend *handler)
 {
 	struct synaptics_clearpad *this =
 	container_of(handler, struct synaptics_clearpad, early_suspend);
-	
-	#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
-	printk("\n [S2W]: Screen suspended\n");        
-	screen_sus = 1;
-	in_prog=0;
-	#endif
-
 
 	dev_info(&this->pdev->dev, "early suspend\n");
 	synaptics_clearpad_suspend(&this->pdev->dev);
@@ -2893,11 +2888,6 @@ static void synaptics_clearpad_late_resume(struct early_suspend *handler)
 {
 	struct synaptics_clearpad *this =
 	container_of(handler, struct synaptics_clearpad, early_suspend);
-
-	#ifdef CONFIG_TOUCHSCREEN_SWEEP2WAKE
-	printk("\n [S2W]: Screen not suspended\n");
-        screen_sus = 0;
-	#endif
 
 	dev_info(&this->pdev->dev, "late resume\n");
 	synaptics_clearpad_resume(&this->pdev->dev);
