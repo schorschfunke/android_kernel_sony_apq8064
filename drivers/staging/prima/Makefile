@@ -570,7 +570,7 @@ CDEFINES += -DMSM_PLATFORM_7x30
 endif
 
 ifeq ($(CONFIG_MACH_MSM7X27_SURF),y)
-#EXTRA_CFLAGS += -march=armv6
+EXTRA_CFLAGS += -march=armv6
 CDEFINES += -DMSM_PLATFORM_7x27
 endif
 
