@@ -64,7 +64,6 @@ static const char Unused_file[] = "Unused swap file entry ";
 static const char Bad_offset[] = "Bad swap offset entry ";
 static const char Unused_offset[] = "Unused swap offset entry ";
 
-=======
 #ifdef CONFIG_FRONTSWAP
 struct swap_list_t swap_list = {-1, -1};
 
