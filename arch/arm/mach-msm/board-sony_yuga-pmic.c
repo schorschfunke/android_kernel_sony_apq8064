@@ -434,6 +434,9 @@ apq8064_pm8921_chg_pdata __devinitdata = {
 	.thermal_mitigation	= apq8064_pm8921_therm_mitigation,
 	.thermal_levels		= ARRAY_SIZE(apq8064_pm8921_therm_mitigation),
 	.rconn_mohm		= 18,
+#ifndef CONFIG_PM8921_SONY_BMS_CHARGER
+	.enable_tcxo_warmup_delay = true,
+#endif
 	.btc_override		= 1,
 	.btc_override_cold_degc	= 5,
 	.btc_override_hot_degc	= 55,
@@ -470,6 +473,11 @@ apq8064_pm8921_bms_pdata __devinitdata = {
 	.adjust_soc_low_threshold	= 25,
 	.chg_term_ua			= CHG_TERM_MA * 1000,
 	.enable_fcc_learning		= 1,
+#ifndef CONFIG_PM8921_SONY_BMS_CHARGER
+	.min_fcc_learning_soc		= 20,
+	.min_fcc_ocv_pc			= 30,
+	.min_fcc_learning_samples	= 5,
+#endif
 	.normal_voltage_calc_ms		= 20000,
 	.low_voltage_calc_ms		= 1000,
 #ifndef CONFIG_PM8921_SONY_BMS_CHARGER

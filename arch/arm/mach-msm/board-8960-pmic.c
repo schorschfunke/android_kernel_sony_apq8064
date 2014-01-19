@@ -434,12 +434,14 @@ static struct pm8921_bms_platform_data pm8921_bms_pdata __devinitdata = {
 	.chg_term_ua			= CHG_TERM_MA * 1000,
 	.normal_voltage_calc_ms		= 20000,
 	.low_voltage_calc_ms		= 1000,
+#ifndef CONFIG_PM8921_SONY_BMS_CHARGER
 	.alarm_low_mv			= 3400,
 	.alarm_high_mv			= 4000,
 	.enable_fcc_learning		= 1,
 	.min_fcc_learning_soc		= 20,
 	.min_fcc_ocv_pc			= 30,
 	.min_fcc_learning_samples	= 5,
+#endif
 };
 
 #define	PM8921_LC_LED_MAX_CURRENT	4	/* I = 4mA */
