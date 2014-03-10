@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -2327,12 +2327,6 @@ int wlan_hdd_crda_reg_notifier(struct wiphy *wiphy,
     int i,j,k,m;
     wiphy_dbg(wiphy, "info: cfg80211 reg_notifier callback for country"
                      " %c%c\n", request->alpha2[0], request->alpha2[1]);
-    if (pHddCtx->isLoadUnloadInProgress)
-    {
-       wiphy_dbg(wiphy, "info: %s: Unloading/Loading in Progress. Ignore!!!",
-                 __func__);
-       return 0;
-    }
     if (request->initiator == NL80211_REGDOM_SET_BY_USER)
     {
        int status;
@@ -2522,7 +2516,7 @@ int wlan_hdd_crda_reg_notifier(struct wiphy *wiphy,
                                wiphy->bands[IEEE80211_BAND_5GHZ]->channels[j].center_freq == 5200 ||
                                wiphy->bands[IEEE80211_BAND_5GHZ]->channels[j].center_freq == 5220 ||
                                wiphy->bands[IEEE80211_BAND_5GHZ]->channels[j].center_freq == 5240) &&
-                               ((domainIdCurrent == REGDOMAIN_FCC) && pHddCtx->nEnableStrictRegulatoryForFCC))
+                               ((ccode[0]== 'U'&& ccode[1]=='S') && pHddCtx->nEnableStrictRegulatoryForFCC))
                 {
                    wiphy->bands[IEEE80211_BAND_5GHZ]->channels[j].flags |= IEEE80211_CHAN_PASSIVE_SCAN;
                 }
@@ -2530,7 +2524,7 @@ int wlan_hdd_crda_reg_notifier(struct wiphy *wiphy,
                                     wiphy->bands[IEEE80211_BAND_5GHZ]->channels[j].center_freq == 5200 ||
                                     wiphy->bands[IEEE80211_BAND_5GHZ]->channels[j].center_freq == 5220 ||
                                     wiphy->bands[IEEE80211_BAND_5GHZ]->channels[j].center_freq == 5240) &&
-                                    ((domainIdCurrent != REGDOMAIN_FCC) || !pHddCtx->nEnableStrictRegulatoryForFCC))
+                                    ((ccode[0]!= 'U'&& ccode[1]!='S') || !pHddCtx->nEnableStrictRegulatoryForFCC))
                 {
                    wiphy->bands[IEEE80211_BAND_5GHZ]->channels[j].flags &= ~IEEE80211_CHAN_PASSIVE_SCAN;
                 }

@@ -932,13 +932,8 @@ VOS_STATUS vos_ftm_preStart( v_CONTEXT_t vosContext )
    VOS_TRACE(VOS_MODULE_ID_SYS, VOS_TRACE_LEVEL_INFO,
              "vos prestart");
 
-   if (NULL == pVosContext->pWDAContext)
-   {
-      VOS_ASSERT(0);
-      VOS_TRACE(VOS_MODULE_ID_SYS, VOS_TRACE_LEVEL_ERROR,
-            "%s: WDA NULL context", __func__);
-      return VOS_STATUS_E_FAILURE;
-   }
+
+   VOS_ASSERT( NULL != pVosContext->pWDAContext);
 
    /* call macPreStart */
    vStatus = macPreStart(pVosContext->pMACContext);
@@ -1309,7 +1304,7 @@ static int wlan_hdd_ftm_start(hdd_context_t *pHddCtx)
                     "%s: WDA_NVDownload_Start reporting  other error \n",__func__);
        }
        VOS_ASSERT(0);
-       goto err_status_failure;
+       goto err_wda_stop;   
     }
 
     vStatus = WDA_start(pVosContext);
@@ -3719,12 +3714,7 @@ static VOS_STATUS wlan_ftm_priv_set_mac_address(hdd_adapter_t *pAdapter,char *bu
     pMsgBody->SetNvField.nvField = NV_COMMON_MAC_ADDR;
 
     /*We get the mac address in string format "XX:XX:XX:XX:XX:XX" convert to hex*/
-    if (6 != sscanf(buf,"%02x:%02x:%02x:%02x:%02x:%02x",&macAddr[0],(int*)&macAddr[1],(int*)&macAddr[2],(int*)&macAddr[3],(int*)&macAddr[4],(int*)&macAddr[5]))
-    {
-       VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_ERROR,
-                 "Invalid MacAddress Input %s", buf);
-       return VOS_STATUS_E_FAILURE;
-    }
+    sscanf(buf,"%02x:%02x:%02x:%02x:%02x:%02x",&macAddr[0],(int*)&macAddr[1],(int*)&macAddr[2],(int*)&macAddr[3],(int*)&macAddr[4],(int*)&macAddr[5]);
 
     VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_INFO_HIGH, "MacAddress = %02x:%02x:%02x:%02x:%02x:%02x",MAC_ADDR_ARRAY(macAddr));
 
@@ -3787,39 +3777,26 @@ static int iw_ftm_setchar_getnone(struct net_device *dev, struct iw_request_info
 {
     int ret,sub_cmd;
     unsigned int length;
-    char *pointer,*param;
     VOS_STATUS status;
     hdd_adapter_t *pAdapter;
 
     ret =0;
-    pointer = wrqu->data.pointer;
     length = wrqu->data.length;
     sub_cmd = wrqu->data.flags;
     pAdapter = (hdd_adapter_t *)netdev_priv(dev);
 
-    /* we cannot use iotctl_private_iw_point in kernel to allocate memory
-     * to store data from userspace as IW_SETCHAR_GETNONE is defined as
-     * odd number which assigns set_args to zero.we assisgn memory using
-     * kzalloc here to hold userspace data
+    /*we can only accept input falling between 1 and length bytes,
+     *and ensure extra is null delimited string
      */
-    param = kzalloc(length + 1, GFP_KERNEL);
-    if (!param)
+    if (wrqu->data.length>=512)
         return -EINVAL;
-
-    if (copy_from_user(param, pointer, length))
-    {
-        VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_INFO,
-              "%s:Failed to get user data %s", __func__, param);
-
-        ret = -EINVAL;
-        goto OUT;
-    }
+    vos_mem_zero(extra + length,512 - length);
 
     VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_INFO,
               "%s: Received length %d", __func__, length);
 
     VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_INFO,
-              "%s: Received parameters %s", __func__,param);
+              "%s: Received data %s", __func__, extra);
 
     switch(sub_cmd)
     {
@@ -3829,7 +3806,7 @@ static int iw_ftm_setchar_getnone(struct net_device *dev, struct iw_request_info
           VOS_TRACE(VOS_MODULE_ID_HDD, VOS_TRACE_LEVEL_INFO,
                     "SET MAC ADDRESS\n");
 
-          status  = wlan_ftm_priv_set_mac_address(pAdapter,param);
+          status  = wlan_ftm_priv_set_mac_address(pAdapter,extra);
 
           if(status != VOS_STATUS_SUCCESS)
           {
@@ -3843,7 +3820,7 @@ static int iw_ftm_setchar_getnone(struct net_device *dev, struct iw_request_info
        break;
        case WE_SET_TX_RATE:
        {
-            status  = wlan_ftm_priv_set_txrate(pAdapter,param);
+            status  = wlan_ftm_priv_set_txrate(pAdapter,extra);
 
             if(status != VOS_STATUS_SUCCESS)
             {
@@ -3862,9 +3839,6 @@ static int iw_ftm_setchar_getnone(struct net_device *dev, struct iw_request_info
            break;
        }
     }
-
-OUT:
-    kfree(param);
     return ret;
 }
 
