@@ -347,11 +347,11 @@ CHECK		= sparse
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-CFLAGS_MODULE   = -fno-pic -mfpu=neon-vfpv4 -mcpu=cortex-a15 -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -ffast-math -fsingle-precision-constant -ftree-vectorize -funswitsch-loops
-AFLAGS_MODULE   = -fno-pic -mfpu=neon-vfpv4 -mcpu=cortex-a15 -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -ffast-math -fsingle-precision-constant -ftree-vectorize -funswitsch-loops
+CFLAGS_MODULE   = -fno-pic -mfpu=neon-vfpv4 -mcpu=cortex-a15 -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -ffast-math -fsingle-precision-constant -ftree-vectorize
+AFLAGS_MODULE   = -fno-pic -mfpu=neon-vfpv4 -mcpu=cortex-a15 -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -ffast-math -fsingle-precision-constant -ftree-vectorize
 LDFLAGS_MODULE  = --strip-debug
-CFLAGS_KERNEL	= -mcpu=cortex-a15 -marm -mfpu=neon-vfpv4 -ftree-vectorize -funroll-loops -funswitch-loops -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -ffast-math -fsingle-precision-constant
-AFLAGS_KERNEL	= -mcpu=cortex-a15 -marm -mfpu=neon-vfpv4 -ftree-vectorize -funroll-loops -funswitch-loops -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -ffast-math -fsingle-precision-constant  
+CFLAGS_KERNEL	= -mcpu=cortex-a15 -marm -mfpu=neon-vfpv4 -ftree-vectorize -funroll-loops -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -ffast-math -fsingle-precision-constant
+AFLAGS_KERNEL	= -mcpu=cortex-a15 -marm -mfpu=neon-vfpv4 -ftree-vectorize -funroll-loops -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -ffast-math -fsingle-precision-constant  
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 
