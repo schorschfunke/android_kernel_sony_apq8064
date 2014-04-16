@@ -506,6 +506,7 @@ void hidraw_report_event(struct hid_device *hid, u8 *data, int len)
 {
 	struct hidraw *dev = hid->hidraw;
 	struct hidraw_list *list;
+	int ret = 0;
 
 	list_for_each_entry(list, &dev->list, node) {
 #ifdef CONFIG_HID_SONY_PS3_CTRL_BT
