@@ -17,6 +17,11 @@
 
 #include "mdss_dsi.h"
 
+
+#ifdef CONFIG_POWERSUSPEND
+#include <linux/powersuspend.h>
+#endif
+
 #define DT_CMD_HDR 6
 
 static struct dsi_buf dsi_panel_tx_buf;
@@ -45,6 +50,10 @@ static int mdss_dsi_panel_on(struct mdss_panel_data *pdata)
 		return -EINVAL;
 	}
 
+#ifdef CONFIG_POWERSUSPEND
+	set_power_suspend_state_pannel_hook(POWER_SUSPEND_INACTIVE);
+#endif
+
 	return 0;
 }
 
@@ -63,6 +72,10 @@ static int mdss_dsi_panel_off(struct mdss_panel_data *pdata)
 		pr_debug("%s:%d, CMD mode not supported", __func__, __LINE__);
 		return -EINVAL;
 	}
+
+#ifdef CONFIG_POWERSUSPEND
+	set_power_suspend_state_pannel_hook(POWER_SUSPEND_ACTIVE);
+#endif
 
 	return 0;
 }
