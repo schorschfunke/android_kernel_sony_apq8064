@@ -367,7 +367,10 @@ static int tsens_tz_set_trip_temp(struct thermal_zone_device *thermal,
 {
 	struct tsens_tm_device_sensor *tm_sensor = thermal->devdata;
 	unsigned int reg_cntl;
-	int code, hi_code, lo_code, code_err_chk;
+	int code, hi_code, lo_code, code_err_chk, sensor_sw_id = 0, rc = 0;
+
+	if (!tm_sensor || trip < 0)
+		return -EINVAL;
 
 	code_err_chk = code = tsens_tz_degc_to_code(temp,
 					tm_sensor->sensor_num);
@@ -453,6 +456,15 @@ static irqreturn_t tsens_isr(int irq, void *data)
 			lower_thr = true;
 		}
 		if (upper_thr || lower_thr) {
+			unsigned long temp;
+			enum thermal_trip_type trip =
+					THERMAL_TRIP_CONFIGURABLE_LOW;
+
+			if (upper_thr)
+				trip = THERMAL_TRIP_CONFIGURABLE_HI;
+			tsens_tz_get_temp(tm->sensor[i].tz_dev, &temp);
+			thermal_sensor_trip(tm->sensor[i].tz_dev, trip, temp);
+
 			/* Notify user space */
 			schedule_work(&tm->sensor[i].work);
 			pr_debug("sensor:%d trigger temp (%d degC)\n", i,
