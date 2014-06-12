@@ -8087,3 +8087,4 @@ MODULE_PARM_DESC(enable_hs, "Enable A2MP protocol");
 
 module_param(enable_reconfig, bool, 0644);
 MODULE_PARM_DESC(enable_reconfig, "Enable reconfig after initiating AMP move");
+
