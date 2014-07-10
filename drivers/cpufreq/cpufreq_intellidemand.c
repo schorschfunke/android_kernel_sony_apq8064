@@ -53,7 +53,7 @@
 #define MAX_FREQUENCY_UP_THRESHOLD		(100)
 #define MIN_FREQUENCY_DOWN_DIFFERENTIAL		(1)
 
-#define DBS_INPUT_EVENT_MIN_FREQ		(1267200)
+#define DBS_INPUT_EVENT_MIN_FREQ		(1242000)
 #define DEF_UI_DYNAMIC_SAMPLING_RATE		(30000)
 #define DBS_UI_SAMPLING_MIN_TIMEOUT		(30)
 #define DBS_UI_SAMPLING_MAX_TIMEOUT		(1000)
@@ -61,8 +61,8 @@
 
 #define DEF_FREQ_STEP				(25)
 
-#define DEF_STEP_UP_EARLY_HISPEED		(1190400)
-#define DEF_STEP_UP_INTERIM_HISPEED		(1958400)
+#define DEF_STEP_UP_EARLY_HISPEED		(1134000)
+#define DEF_STEP_UP_INTERIM_HISPEED		(1350000)
 #define DEF_SAMPLING_EARLY_HISPEED_FACTOR	(2)
 #define DEF_SAMPLING_INTERIM_HISPEED_FACTOR	(3)
 
@@ -84,7 +84,7 @@ static unsigned long stored_sampling_rate;
 #endif
 
 #if defined(SMART_UP_PLUS)
-static unsigned int SUP_THRESHOLD_STEPS[SUP_MAX_STEP] = {85, 90, 95};
+static unsigned int SUP_THRESHOLD_STEPS[SUP_MAX_STEP] = {75, 85, 95};
 static unsigned int SUP_FREQ_STEPS[SUP_MAX_STEP] = {4, 3, 2};
 //static unsigned int min_range = 108000;
 typedef struct{
@@ -98,8 +98,8 @@ static freq_table_idx pre_freq_idx[SUP_CORE_NUM] = {};
 
 #if defined(SMART_UP_SLOW_UP_AT_HIGH_FREQ)
 
-#define SUP_SLOW_UP_FREQUENCY 		(1190400)
-#define SUP_HIGH_SLOW_UP_FREQUENCY 	(1958400)
+#define SUP_SLOW_UP_FREQUENCY 		(1350000)
+#define SUP_HIGH_SLOW_UP_FREQUENCY 	(1512000)
 #define SUP_SLOW_UP_LOAD 		(95)
 
 typedef struct {
