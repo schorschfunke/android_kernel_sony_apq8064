@@ -2267,7 +2267,7 @@ struct unix_iter_state {
 	struct seq_net_private p;
 };
 
-static struct sock *unix_from_bucket(struct seq_file *seq, loff_t pos)
+static struct sock *unix_from_bucket(struct seq_file *seq, loff_t *pos)
 {
         unsigned long offset = get_offset(*pos);
         unsigned long bucket = get_bucket(*pos);
