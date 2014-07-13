@@ -274,9 +274,9 @@ static unsigned long get_init_ra_size(unsigned long size, unsigned long max)
 {
 	unsigned long newsize = roundup_pow_of_two(size);
 
-	if (newsize <= (max >> 5)
+	if (newsize <= (max >> 5))
 		newsize = newsize << 2;
-	else if (newsize <= max >> 2)
+	else if (newsize <= (max >> 2))
 		newsize = newsize << 1;
 	else
 		newsize = max;
@@ -295,9 +295,9 @@ static unsigned long get_next_ra_size(struct file_ra_state *ra,
 	unsigned long newsize;
 
 	if (cur < max >> 4)
-		newsize = cur >> 2;
+		newsize = cur << 2;
 	else
-		newsize = cur >> 1;
+		newsize = cur << 1;
 
 	return min(newsize, max);
 }
