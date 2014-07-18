@@ -431,7 +431,6 @@ static void cpufreq_interactive_timer(unsigned long data)
 	pcpu->hispeed_validate_time = now;
 
 	if (cpufreq_frequency_table_target(pcpu->policy, pcpu->freq_table,
-					   new_freq, CPUFREQ_RELATION_L,
 					   new_freq, CPUFREQ_RELATION_C,
 					   &index))
 		goto rearm;
