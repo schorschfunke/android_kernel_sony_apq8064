@@ -107,10 +107,10 @@ static int lz4_uncompress(const char *source, char *dest, int osize)
 		length = token & ML_MASK;
 		if (length == ML_MASK) {
 			for (; *ip == 255; length += 255)
-				ip++;
+				len = *ip++;
 			if (unlikely(length > (size_t)(length + len)))
 				goto _output_error;
-			length += *ip++;
+			length += len;
 		}
 
 		/* copy repeated sequence */
