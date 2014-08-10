@@ -480,7 +480,7 @@ static struct attribute *sound_control_attrs[] =
 		&sound_reg_sel_attribute.attr,
 		&sound_reg_read_attribute.attr,
                 &sound_reg_write_attribute.attr,
-		&sound_hw_revsion_attribute.attr,
+		&sound_hw_revision_attribute.attr,
 		&sound_control_version_attribute.attr,
 		NULL,
 	};
