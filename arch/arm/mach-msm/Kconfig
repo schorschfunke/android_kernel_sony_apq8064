@@ -2942,3 +2942,11 @@ config MSM_MODEM_SUBSYSTEM_RESTART_MONITOR
 	  applications of modem subsystem power up/down event via uevent.
 
 endif
+
+config HAS_MACH_MEMUTILS
+	default y
+	bool "Motorola MSM memcpy enhancements"
+	help
+	  Faster memcpy performance for Krait
+
+endif 
