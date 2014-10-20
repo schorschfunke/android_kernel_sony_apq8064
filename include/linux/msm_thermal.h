@@ -20,10 +20,6 @@ struct msm_thermal_data {
 #ifdef CONFIG_INTELLI_THERMAL
 	uint32_t freq_control_mask;
 #endif
-#ifdef CONFIG_INTELLI_THERMAL_V2
-	int32_t ocr_temp_degC;
-	int32_t ocr_temp_hyst_degC;
-#endif
 	int32_t limit_temp_degC;
 	int32_t temp_hysteresis_degC;
 	uint32_t freq_step;
@@ -33,9 +29,7 @@ struct msm_thermal_data {
 
 };
 
-#if defined(CONFIG_THERMAL_MONITOR) ||\
-    defined(CONFIG_INTELLI_THERMAL) ||\
-    defined(CONFIG_INTELLI_THERMAL_V2)
+#if defined(CONFIG_THERMAL_MONITOR) || defined(CONFIG_INTELLI_THERMAL)
 extern int msm_thermal_init(struct msm_thermal_data *pdata);
 extern int msm_thermal_device_init(void);
 #else
